@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        .comment-box {
+            border-left: 3px solid #007bff;
+            margin-left: 20px;
+            margin-top: 10px;
+            padding-left: 15px;
+        }
+        .comment-content {
+            background-color: #e6f3ff;
+            padding: 8px;
+            border-radius: 4px;
+        }
+        .reply-form {
+            margin-top: 10px;
+            margin-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div style="width: 50%; min-width: 500px; background-color: red; padding: 10px">
+        {% for post in posts %}
+            {% include 'blog/post.html' with post=post comments=comments form=form%}
+        {% endfor %}
+    </div>
+</body>
+</html>

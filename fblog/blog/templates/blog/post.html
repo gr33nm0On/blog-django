@@ -1,0 +1,22 @@
+<div style="background-color: yellow; margin: 15px; margin-left:40px; margin-bottom:40px; padding:10px;">
+    <p style="background-color: grey;">{{ post.user.username }}</p>
+    <div style="background-color: green; margin: 5px; padding:5px;">{{ post.title }}</div>
+    <div style="background-color: green; margin: 5px; padding:5px; overflow-wrap: break-word">{{ post.content }}</div>
+
+    <div style="background-color: purple; padding: 10px;">
+        <form type="hidden" method="post" action="{% url 'add_comment' %}">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <input type="hidden" name="post_id" value="{{ post.id }}">
+            <input type="hidden" name="reply_to" value="">
+            <input type="hidden" name="redirect_to" value="{{ redirect_to }}">
+            <button type="submit">Отправить комментарий</button>
+        </form>
+            <h3 style="color: white;">Комментарии:</h3>
+            {% for comment in root_comments %}
+                {% if comment.post_id == post.id %}
+                    {% include 'blog/comment_tree.html' with comment=comment post=post form=form redirect_to=redirect_to%}
+                {% endif%}
+            {% endfor %}
+    </div>
+</div>

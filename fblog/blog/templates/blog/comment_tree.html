@@ -1,0 +1,19 @@
+<div class="comment-box" style="margin-left: 20px; margin-top: 10px;">
+    <div class="comment-content" style="background-color: lightblue; padding: 8px; border-radius: 4px;">
+        <p style="background-color: grey;">{{ comment.user }}</p>
+        <p>{{ comment.content }}</p>
+        <form method="post" action="{% url 'add_comment' %}" class="reply-form" style="margin-top: 10px;">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <input type="hidden" name="post_id" value="{{ post.id }}">
+            <input type="hidden" name="reply_to" value="{{ comment.id }}">
+            <input type="hidden" name="redirect_to" value="{{ redirect_to }}">
+            <button type="submit">Ответить</button>
+        </form>
+    </div>
+        <div style="margin-left: 30px;">
+            {% for child in comment.children %}
+                {% include 'blog/comment_tree.html' with comment=child post=post form=form redirect_to=redirect_to%}
+            {% endfor %}
+        </div>
+</div>

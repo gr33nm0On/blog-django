@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    {{ user.username }}
+    {{ user.pk }}
+    <form action="{% url 'create_post' %}" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="hidden" name="redirect_to" value="{{ redirect_to }}}">
+        <button type="submit">post</button>
+    </form>
+    <div style="width: 50%; min-width: 500px; background-color: red; padding: 10px">
+        {% for post in posts %}
+            {% include 'blog/post.html' with post=post comments=comments form=comment_form redirect_to=redirect_to %}
+        {% endfor %}
+    </div>
+</body>
+</html>
