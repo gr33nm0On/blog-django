@@ -24,7 +24,7 @@
         </form>
     </div>
     {% if comment.children %}
-    <button id="btn-comment-comments-list-container-{{ comment.id }}" onclick="showCommentComments('{{ post.id }}')" style="width: 100%;">Show replies</button>
+    <button id="btn-comment-comments-list-container-{{ comment.id }}" onclick="showCommentComments('{{ comment.id }}')" style="width: 100%;">Show replies</button>
     <div id="comment-comments-list-container-{{ comment.id }}" style="display: none; background: ">
     {% for child in comment.children %}
         {% include "blog/comment_tree.html" with comment=child post=post form=form redirect_to=redirect_to %}

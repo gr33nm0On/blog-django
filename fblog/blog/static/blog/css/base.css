@@ -1,0 +1,108 @@
+body {
+        margin: 0;
+        background: black;
+        color: rgb(220, 242, 191);
+        font-family: "Bitcount Single", system-ui;
+    }
+
+    .bitcount-single-bit {
+        color: rgb(220, 242, 191);
+        font-weight: 400;
+    }
+
+    nav {
+        height: 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 40px;
+        border-bottom: 3px solid rgb(220, 242, 191);
+    }
+
+    ul {
+        margin: 0;
+        list-style: none;
+        display: flex;
+        padding: 0;
+    }
+
+    ul li {
+        margin-right: 15px;
+    }
+
+    a {
+        text-decoration: none;
+        color: rgb(220, 242, 191);
+    }
+
+    a:hover {
+        opacity: 0.7;
+    }
+
+    .container {
+        width: 70%;
+        min-width: 600px;
+        margin: 40px auto;
+    }
+
+    .card {
+        border: 2px solid rgb(220, 242, 191);
+        padding: 15px;
+        margin-bottom: 30px;
+    }
+
+    .comment-box {
+        border-left: 2px solid rgb(220, 242, 191);
+        margin-left: 25px;
+        margin-top: 15px;
+        padding-left: 15px;
+    }
+
+    input, textarea, button {
+        width: 100px;
+        background: black;
+        color: rgb(220, 242, 191);
+        border: 1px solid rgb(220, 242, 191);
+        padding: 5px;
+        font-family: "Bitcount Single", system-ui;
+    }
+
+    button:hover {
+        cursor: pointer;
+        opacity: 0.8;
+    }
+
+    div.post-content {
+        margin-left: 30px;
+        border: 3px solid rgba(220, 242, 191, 0.5);
+    }
+
+    div.post-content p {
+        margin-left: 20px;
+    }
+
+    div.post-container {
+        padding: 10px;
+        border: 3px solid rgb(220, 242, 191);
+    }
+
+    div.comment-container {
+        padding: 10px;
+        border: 3px solid rgba(220, 242, 191);
+    }
+
+    div.comment-content {
+        margin-left:20px;
+        border: 3px solid rgba(220, 242, 191, 0.5);
+        padding: 10px;
+    }
+
+    div.comment-content p {
+        margin-left:20px;
+    }
+
+    textarea {
+        width: 95%;
+        margin-right: 10px;
+        resize: none;
+    }

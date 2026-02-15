@@ -1,0 +1,22 @@
+<nav>
+	<a class="bitcount-single-bit" href="{% url 'view_post' %}">Lenta</a>
+    {% if user.is_authenticated %}
+    <ul>
+        <li>
+            <a class="bitcount-single-bit" href="{% url 'profile' id=user.id %}">{{ user.username }}</a>
+        </li>
+        <li>
+            <a class="bitcount-single-bit" href="{% url 'logout' %}">logout</a>
+        </li>
+    </ul>
+    {% else %}
+    <ul>
+        <li>
+            <a class="bitcount-single-bit" href="{% url 'login' %}">login</a>
+        </li>
+        <li>
+            <a class="bitcount-single-bit" href="{% url 'register' %}">register</a>
+        </li>
+    </ul>
+    {% endif %}
+</nav>
