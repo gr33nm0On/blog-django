@@ -1,54 +1,16 @@
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect, reverse
 from django.views import View
 
-from .forms import PostForm, CommentForm, LoginForm
+from .forms import PostForm, CommentForm, LoginForm, RegisterForm
 from .models import Post, Comment
 
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import UserCreationForm
 
 from django.views.generic import ListView, RedirectView, TemplateView
-
-
-def get_comments(comments):
-    class PyComment():
-        def __init__(self, id, user=None, post_id = None, parent_id=None, content=None):
-            self.id = id
-            self.post_id = post_id
-            self.parent_id = parent_id
-            self.user = user
-            self.children = []
-            self.content = content
-
-    def convert(comment: Comment):
-        return PyComment(
-            comment.id,
-            comment.user.username,
-            comment.post_id if comment.post_id else None,
-            comment.parent.id if comment.parent else None,
-            comment.content,
-        )
-
-    py_comments = []
-    comment_dict = {}
-
-    for comment in comments:
-        py_comment = convert(comment)
-        py_comments.append(py_comment)
-        comment_dict[comment.id] = py_comment
-
-    for comment in py_comments:
-        if comment.parent_id:
-            parent = comment_dict.get(comment.parent_id)
-            if parent:
-                parent.children.append(comment)
-
-    root_comments = [c for c in py_comments if c.parent_id is None]
-    return {'root_comments': root_comments, 'comments': py_comments}
-
+from .service import get_comments
 
 class CreatePostView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
@@ -79,6 +41,7 @@ class ViewPostListView(ListView):
         context['comments'] = result.get('comments')
         context['form'] = form
         context['redirect_to'] = reverse('view_post')
+        context['user'] = self.request.user
 
         return context
 
@@ -103,6 +66,52 @@ class CreateCommentView(LoginRequiredMixin, View):
             Comment.objects.create(**config)
         return redirect(redirect_to)
 
+class ProfileView(ListView):
+    model = Post
+    template_name = 'blog/profile.html'
+    context_object_name = 'posts'
+
+    def get_queryset(self, **kwargs):
+        user = User.objects.get(id=self.kwargs.get('id'))
+        posts = Post.objects.filter(user=user)
+        py_posts = []
+
+        class PyPost:
+            def __init__(self, **kwargs):
+                self.id = kwargs['id']
+                self.title = kwargs['title']
+                self.content = kwargs['content']
+                self.user = kwargs['user']
+                self.comments = kwargs['comments']
+
+        for post in posts:
+            comments = get_comments(Comment.objects.filter(post_id=post.id)).get("root_comments")
+            config = {
+                "id": post.id,
+                "title": post.title,
+                "content": post.content,
+                "user": post.user,
+                "comments": comments,
+            }
+            py_posts.append(PyPost(**config))
+        return py_posts
+
+    def get_context_data(self, **kwargs):
+        owner = User.objects.get(id=self.kwargs.get('id'))
+        context = super().get_context_data(**kwargs)
+
+        context["user"] = self.request.user
+        context["owner"] = owner
+        context["form"] = PostForm()
+        context["comment_form"] = CommentForm()
+        context["redirect_to"] = self.request.path
+
+        return context
+
+
+
+
+
 class LoginView(View):
     def get(self, request, *args, **kwargs):
         form = LoginForm()
@@ -124,9 +133,8 @@ class LoginView(View):
 
 class RegisterView(View):
     def get(self, request, *args, **kwargs):
-        form = UserCreationForm()
+        form = RegisterForm()
         return render(request, 'blog/register.html', {'form': form})
-
 
     def post(self, request, *args, **kwargs):
         form = UserCreationForm(request.POST)
@@ -136,23 +144,7 @@ class RegisterView(View):
             return redirect("view_post")
         return self.get(request, *args, **kwargs)
 
-class ProfileView(LoginRequiredMixin, ListView):
-    model = Post
-    template_name = 'blog/profile.html'
-    context_object_name = 'posts'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        comments = Comment.objects.all()
-
-        context["user"] = self.request.user
-        context["form"] = PostForm()
-        context["comment_form"] = CommentForm()
-        result = get_comments(comments)
-
-        context["comments"] = result.get('comments')
-        context["root_comments"] = result.get('root_comments')
-        context["redirect_to"] = reverse('profile')
-
-        return context
+class LogoutView(View):
+    def get(self, request, *args, **kwargs):
+        logout(request)
+        return redirect('view_post')

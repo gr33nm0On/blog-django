@@ -1,9 +1,20 @@
+from django.contrib.auth.forms import UserCreationForm
 from django.db import models
 from django import forms
-from django.forms.models import ModelForm
+from django.contrib.auth.models import User
 
 from .models import Post, Comment
 
+class RegisterForm(UserCreationForm):
+    def __init__(self, *args, **kwargs):
+        super(UserCreationForm, self).__init__(*args, **kwargs)
+
+        for fieldname in ['username', 'password1', 'password2']:
+            self.fields[fieldname].help_text = None
+
+    class Meta:
+        model = User
+        fields = ('username', 'password1', 'password2')
 
 class PostForm(forms.ModelForm):
     title = models.CharField()
