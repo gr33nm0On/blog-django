@@ -17,8 +17,11 @@ from .service import get_comments
 from django.core.paginator import Paginator
 from django.template.loader import render_to_string
 
-def get_paginated_posts(page_number, per_page=3):
-    posts = Post.objects.order_by('-id')
+def get_paginated_posts(page_number, per_page=3, filter=None):
+    if filter:
+        posts = Post.objects.filter(**filter).order_by('-id')
+    else:
+        posts = Post.objects.order_by('-id')
     paginator = Paginator(posts, per_page)
     return paginator.get_page(page_number)
 
@@ -104,7 +107,7 @@ class ProfileView(ListView):
 
     def get_queryset(self, **kwargs):
         user = User.objects.get(id=self.kwargs.get('id'))
-        posts = Post.objects.filter(user=user)
+        posts = get_paginated_posts(1, filter={"user": user})
         py_posts = []
 
         class PyPost:

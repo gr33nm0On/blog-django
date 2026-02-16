@@ -17,12 +17,12 @@
     {% endif %}
 </div>
 
-<ul style="flex-direction: column;">
-    {% for post in posts %}
-        <li>
-            {% include "blog/post.html" with post=post comments=post.comments form=comment_form redirect_to=redirect_to %}
-        </li>
-    {% endfor %}
+{% load static %}
+
+<script src="{% static 'blog/js/ajax.js' %}"></script>
+<ul style="flex-direction: column;" id="post-container">
+    {% include "blog/posts.html" with posts=posts comments=root_comments form=form redirect_to=redirect_to %}
 </ul>
+<button id="load-more">load more</button>
 
 {% endblock %}
