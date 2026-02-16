@@ -4,12 +4,32 @@
 
 {% block content %}
 
-<ul style="flex-direction: column;">
-    {% for post in posts %}
-        <li>
-            {% include "blog/post.html" with post=post comments=root_comments form=form redirect_to=redirect_to %}
-        </li>
-    {% endfor %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        let page = 2;
+        const btn = document.getElementById("load-more");
+        const container = document.getElementById("post-container");
+
+        btn.addEventListener("click", function() {
+            fetch(`/post/load/?page=${page}`)
+                .then(
+                    function(response) { return response.json(); }
+                )
+                .then(function(data) {
+                    container.insertAdjacentHTML("beforeend", data.html);
+                    if (!data.has_next) {
+                        btn.style.display = "none";
+                    }
+                    page++;
+                }
+                );
+        });
+    });
+</script>
+
+<ul style="flex-direction: column;" id="post-container">
+    {% include "blog/posts.html" with posts=posts comments=root_comments form=form redirect_to=redirect_to %}
 </ul>
+<button id="load-more">load more</button>
 
 {% endblock %}

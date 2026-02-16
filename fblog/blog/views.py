@@ -1,7 +1,10 @@
+from idlelib.query import Query
+
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render, redirect, reverse
+from django.http import JsonResponse, HttpResponse, QueryDict
+from django.shortcuts import render, redirect, reverse, render
 from django.views import View
 
 from .forms import PostForm, CommentForm, LoginForm, RegisterForm
@@ -11,6 +14,30 @@ from django.contrib.auth.models import User
 
 from django.views.generic import ListView, RedirectView, TemplateView
 from .service import get_comments
+from django.core.paginator import Paginator
+from django.template.loader import render_to_string
+
+def get_paginated_posts(page_number, per_page=3):
+    posts = Post.objects.order_by('-id')
+    paginator = Paginator(posts, per_page)
+    return paginator.get_page(page_number)
+
+def load_posts(request):
+    page_number = request.GET.get('page', 1)
+
+    page_obj = get_paginated_posts(page_number)
+
+    form = CommentForm()
+
+    html = render_to_string(
+        "blog/posts.html",
+        {"posts": page_obj.object_list, "form": form},
+    )
+
+    return JsonResponse({
+        "html": html,
+        "has_next": page_obj.has_next()
+    })
 
 class CreatePostView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
@@ -29,6 +56,10 @@ class ViewPostListView(ListView):
     model = Post
     template_name = 'blog/view_post.html'
     context_object_name = 'posts'
+
+    def get_queryset(self):
+        page_obj = get_paginated_posts(1)
+        return page_obj.object_list
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -137,7 +168,7 @@ class RegisterView(View):
         return render(request, 'blog/register.html', {'form': form})
 
     def post(self, request, *args, **kwargs):
-        form = UserCreationForm(request.POST)
+        form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save()
             login(request, user)
