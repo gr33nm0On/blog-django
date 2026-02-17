@@ -1,5 +1,5 @@
 {% for post in posts %}
     <li>
-        {% include "blog/post.html" with post=post comments=root_comments form=form redirect_to=redirect_to %}
+        {% include "blog/post.html" with post=post comments=post.comments form=form redirect_to=redirect_to %}
     </li>
 {% endfor %}

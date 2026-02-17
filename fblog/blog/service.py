@@ -1,38 +1,51 @@
-from .models import Comment
+from django.core.paginator import Paginator
+from django.http import JsonResponse
+from django.template.loader import render_to_string
+
+from .forms import CommentForm
+from .models import Post
 
 
 def get_comments(comments):
-    class PyComment():
-        def __init__(self, id, user=None, post_id = None, parent_id=None, content=None):
-            self.id = id
-            self.post_id = post_id
-            self.parent_id = parent_id
-            self.user = user
-            self.children = []
-            self.content = content
-
-    def convert(comment: Comment):
-        return PyComment(
-            comment.id,
-            comment.user,
-            comment.post_id if comment.post_id else None,
-            comment.parent.id if comment.parent else None,
-            comment.content,
-        )
-
-    py_comments = []
+    root_comments = []
     comment_dict = {}
 
     for comment in comments:
-        py_comment = convert(comment)
-        py_comments.append(py_comment)
-        comment_dict[comment.id] = py_comment
+        comment_dict[comment.id] = comment
+        comment.children = []
 
-    for comment in py_comments:
+    for comment in comments:
         if comment.parent_id:
-            parent = comment_dict.get(comment.parent_id)
+            parent = comment_dict.get(comment.parent.id)
             if parent:
                 parent.children.append(comment)
+        else:
+            root_comments.append(comment)
 
-    root_comments = [c for c in py_comments if c.parent_id is None]
-    return {'root_comments': root_comments, 'comments': py_comments}
+    return root_comments
+
+
+def get_paginated_posts(page_number, per_page=3, filter_dict=None):
+    queryset = Post.objects.all()
+    if filter_dict:
+        queryset = queryset.filter(**filter_dict)
+    queryset = queryset.select_related('user').order_by('-id')
+    paginator = Paginator(queryset, per_page)
+    return paginator.get_page(page_number)
+
+def load_posts(request):
+    page_number = request.GET.get('page', 1)
+
+    page_obj = get_paginated_posts(page_number)
+
+    form = CommentForm()
+
+    html = render_to_string(
+        "blog/posts.html",
+        {"posts": page_obj.object_list, "form": form},
+    )
+
+    return JsonResponse({
+        "html": html,
+        "has_next": page_obj.has_next()
+    })
