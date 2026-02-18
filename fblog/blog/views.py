@@ -1,10 +1,15 @@
+from operator import truediv
+from urllib.parse import uses_relative
+
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import ObjectDoesNotExist
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.views import View
 
 from .forms import PostForm, CommentForm, LoginForm, RegisterForm
-from .models import Post, Comment
+from .models import Post, Comment, Like
 
 from django.contrib.auth.models import User
 
@@ -32,15 +37,24 @@ class AbstractPostView(ListView):
                 self.content = kwargs['content']
                 self.user = kwargs['user']
                 self.comments = kwargs['comments']
+                self.likes = kwargs['likes']
+                self.liked = kwargs['liked']
 
         for post in posts:
             comments = get_comments(Comment.objects.filter(post_id=post.id))
+            likes = Like.objects.filter(post_id=post.id).count()
+            if Like.objects.filter(post_id=post.id, user_id=self.request.user.id).exists():
+                liked = True
+            else:
+                liked = False
             config = {
                 "id": post.id,
                 "title": post.title,
                 "content": post.content,
                 "user": post.user,
                 "comments": comments,
+                "likes": likes,
+                "liked": liked
             }
             py_posts.append(PyPost(**config))
         return py_posts
@@ -56,6 +70,8 @@ class AbstractPostView(ListView):
         context["form"] = PostForm()
         context["comment_form"] = CommentForm()
         context["redirect_to"] = self.request.path
+        context["request_user"] = self.request.user
+        context["like_count"] = Like.objects.filter()
 
         return context
 
@@ -118,9 +134,6 @@ class ProfileView(AbstractPostView):
 
 
 
-
-
-
 class LoginView(View):
     def get(self, request, *args, **kwargs):
         form = LoginForm()
@@ -157,3 +170,15 @@ class LogoutView(View):
     def get(self, request, *args, **kwargs):
         logout(request)
         return redirect('view_post')
+
+
+def post_like(request, post_id, user_id):
+    if Like.objects.filter(post_id=post_id, user_id=user_id).exists():
+        like = Like.objects.get(post_id=post_id, user_id=user_id)
+        like.delete()
+        liked = False
+    else:
+        Like.objects.create(post_id=post_id, user_id=user_id)
+        liked = True
+
+    return JsonResponse({'liked': liked})

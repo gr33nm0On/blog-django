@@ -1,6 +1,7 @@
 {% load static %}
 
 <script src="{% static 'blog/js/base.js' %}"></script>
+<script src="{% static 'blog/js/like.js' with request_user=request_user post_id=post.id %}"></script>
 
 <div class="card">
     <div class="post-container">
@@ -24,6 +25,17 @@
             <button type="submit">Comment</button>
         </form>
     </div>
+    <span>
+        <button id="btn-like-{{ post_id }}" data-post-id="{{ post.id }}" data-user-id="{{ request_user.id }}">
+            {% if post.liked %}
+                unlike
+            {% else %}
+                like
+            {% endif %}
+        </button>
+        <span id="label-post-like-{{ post.id }}">{{ post.likes }}</span>
+    </span>
+
 
     {% if comments %}
         <h4>Comments:</h4>
