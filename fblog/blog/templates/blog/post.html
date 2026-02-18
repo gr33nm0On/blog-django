@@ -26,7 +26,7 @@
         </div>
     </div>
     <div class="btn-like-container">
-        <button id="btn-like-{{ post.id }}" data-post-id="{{ post.id }}" data-user-id="{{ request_user.id }}">
+        <button class="btn-like" id="btn-like-{{ post.id }}" data-post-id="{{ post.id }}" data-user-id="{{ request_user.id }}">
             {% if post.liked %}
                 unlike
             {% else %}
