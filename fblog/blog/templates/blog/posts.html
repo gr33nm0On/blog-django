@@ -1,3 +1,9 @@
+{% load static %}
+
+<script src="{% static 'blog/js/base.js' %}"></script>
+<script src="{% static 'blog/js/like.js' %}"></script>
+<script src="{% static 'blog/js/auto_resize_textarea.js'%}"></script>
+
 {% for post in posts %}
     <li>
         {% include "blog/post.html" with post=post comments=post.comments form=form redirect_to=redirect_to %}

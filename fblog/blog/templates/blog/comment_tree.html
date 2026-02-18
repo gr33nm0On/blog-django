@@ -14,14 +14,16 @@
             <p>{{ comment.content }}</p>
         </div>
 
-        <form method="post" action="{% url 'add_comment' %}">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <input type="hidden" name="post_id" value="{{ post.id }}">
-            <input type="hidden" name="reply_to" value="{{ comment.id }}">
-            <input type="hidden" name="redirect_to" value="{{ redirect_to }}">
-            <button type="submit">Reply</button>
-        </form>
+        <div class="btn-comment-container">
+            <form method="post" action="{% url 'add_comment' %}">
+                {% csrf_token %}
+                {{ comment_form.as_p }}
+                <input type="hidden" name="post_id" value="{{ post.id }}">
+                <input type="hidden" name="reply_to" value="{{ comment.id }}">
+                <input type="hidden" name="redirect_to" value="{{ redirect_to }}">
+                <button type="submit">Reply</button>
+            </form>
+        </div>
     </div>
     {% if comment.children %}
     <button id="btn-comment-comments-list-container-{{ comment.id }}" onclick="showCommentComments('{{ comment.id }}')" style="width: 100%;">Show replies</button>

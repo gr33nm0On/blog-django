@@ -104,5 +104,21 @@ body {
     textarea {
         width: 95%;
         margin-right: 10px;
+    }
+
+    .btn-like-container  {
+        margin-top: 10px;
+    }
+
+    .btn-comment-container {
+        margin-top: 10px;
+    }
+
+    .auto-resize-textarea {
+        height: 30px;
+        min-height: 30px;
+        max-height: 200px;
         resize: none;
+        overflow-y: hidden;
+        box-sizing: border-box;
     }

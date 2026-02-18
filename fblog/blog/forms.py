@@ -18,14 +18,14 @@ class RegisterForm(UserCreationForm):
 
 class PostForm(forms.ModelForm):
     title = models.CharField()
-    content = models.CharField()
+    content = forms.CharField(widget=forms.Textarea(attrs={"class": "post-content-field auto-resize-textarea"}))
 
     class Meta:
         model = Post
         fields = ['title', 'content']
 
 class CommentForm(forms.ModelForm):
-    content = models.CharField()
+    content = forms.CharField(widget=forms.Textarea(attrs={"class": "comment-content-field auto-resize-textarea"}))
 
     class Meta:
         model = Comment
