@@ -1,0 +1,9 @@
+{% if comments %}
+<h4>Comments:</h4>
+<button id="btn-comments-list-container-{{ post.id }}"onclick="showComments('{{ post.id }}')" style="width: 100%;">Show comments</button>
+<div id="comments-list-container-{{ post.id }}" style="display: none;">
+    {% for comment in comments %}
+        {% include "blog/comment_tree.html" with comment=comment post=post comment_form=comment_form %}
+    {% endfor %}
+</div>
+{% endif %}
