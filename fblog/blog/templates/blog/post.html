@@ -15,12 +15,11 @@
         </div>
 
         <div class="btn-comment-container">
-            <form method="post" action="{% url 'add_comment' %}">
+            <form method="post" action="{% url 'create_comment' %}" class="ajax-form" data-type="comment" data-post-id="{{ post.id }}">
                 {% csrf_token %}
                 {{ comment_form.as_p }}
                 <input type="hidden" name="post_id" value="{{ post.id }}">
                 <input type="hidden" name="reply_to" value="">
-                <input type="hidden" name="redirect_to" value="{{ redirect_to }}">
                 <button type="submit">Comment</button>
             </form>
         </div>
@@ -35,16 +34,7 @@
         </button>
         <span id="label-post-like-{{ post.id }}">{{ post.likes }}</span>
     </div>
-
-
-    {% if comments %}
-        <h4>Comments:</h4>
-        <button id="btn-comments-list-container-{{ post.id }}"onclick="showComments('{{ post.id }}')" style="width: 100%;">Show comments</button>
-        <div id="comments-list-container-{{ post.id }}" style="display: none;">
-            {% for comment in comments %}
-                {% include "blog/comment_tree.html" with comment=comment post=post form=form redirect_to=redirect_to %}
-            {% endfor %}
-        </div>
-    {% endif %}
-
+    <div id="comment-container-{{ post.id }}">
+        {% include 'blog/comments.html' with comments=comments post=post comment_form=comment_form %}
+    </div>
 </div>

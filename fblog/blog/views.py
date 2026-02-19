@@ -6,6 +6,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
+from django.template.loader import render_to_string
 from django.views import View
 
 from .forms import PostForm, CommentForm, LoginForm, RegisterForm
@@ -78,7 +79,6 @@ class AbstractPostView(ListView):
 
 class CreatePostView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
-        redirect_to = request.POST.get('redirect_to')
         form = PostForm(request.POST)
         if form.is_valid():
             config = {
@@ -86,17 +86,17 @@ class CreatePostView(LoginRequiredMixin, View):
                 "content": form.cleaned_data['content'],
                 "user": request.user,
             }
-            Post.objects.create(**config)
-        return redirect(redirect_to)
+            post = Post.objects.create(**config)
+            return JsonResponse({"success": True, "html": render_to_string("blog/post.html", context={"post": post, "comment_form": CommentForm()})})
+        return JsonResponse({"success": False})
 
-class ViewPostListView(AbstractPostView):
+class LentaView(AbstractPostView):
     model = Post
     template_name = 'blog/view_post.html'
     context_object_name = 'posts'
 
 class CreateCommentView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
-        redirect_to = request.POST.get('redirect_to')
         form = CommentForm(request.POST)
         if form.is_valid():
             post = Post.objects.get(id=request.POST['post_id'])
@@ -113,7 +113,16 @@ class CreateCommentView(LoginRequiredMixin, View):
                 "user": user,
             }
             Comment.objects.create(**config)
-        return redirect(redirect_to)
+            return JsonResponse(
+                {"success": True,
+                 "html": render_to_string("blog/comments.html", context={
+                "post": post,
+                "comment_form": CommentForm(),
+                "comments": get_comments(Comment.objects.filter(post_id=post.id))
+                }
+                )}
+            )
+        return JsonResponse({"success": False})
 
 class ProfileView(AbstractPostView):
     model = Post

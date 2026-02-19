@@ -1,28 +1,27 @@
 {% extends "blog/base.html" %}
 
 {% block title %}Profile{% endblock %}
-
 {% block content %}
+
+{% load static %}
+
+<script src="{% static 'blog/js/ajax.js' %}"></script>
+<script src="{% static 'blog/js/ajax_form.js' %}"></script>
 
 <div class="card">
     <h2>{{ owner.username }}</h2>
 
     {% if user.id == owner.id %}
-        <form action="{% url 'create_post' %}" method="post">
+        <form method="post" class="ajax-form" action="{% url 'create_post' %}" data-type="post">
             {% csrf_token %}
             {{ form.as_p }}
-            <input type="hidden" name="redirect_to" value="{{ redirect_to }}">
             <button type="submit">Post</button>
         </form>
     {% endif %}
 </div>
 
-{% load static %}
-
-<script src="{% static 'blog/js/ajax.js' %}"></script>
 <ul style="flex-direction: column;" id="post-container">
     {% include "blog/posts.html" with posts=posts comments=root_comments form=form redirect_to=redirect_to %}
 </ul>
 <button id="load-more">load more</button>
-
 {% endblock %}
