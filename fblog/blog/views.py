@@ -92,7 +92,7 @@ class CreatePostView(LoginRequiredMixin, View):
 
 class LentaView(AbstractPostView):
     model = Post
-    template_name = 'blog/view_post.html'
+    template_name = 'blog/lenta.html'
     context_object_name = 'posts'
 
 class CreateCommentView(LoginRequiredMixin, View):
@@ -112,13 +112,13 @@ class CreateCommentView(LoginRequiredMixin, View):
                 "parent": parent,
                 "user": user,
             }
-            Comment.objects.create(**config)
+            comment = Comment.objects.create(**config)
             return JsonResponse(
                 {"success": True,
-                 "html": render_to_string("blog/comments.html", context={
+                 "html": render_to_string("blog/comment_tree.html", context={
                 "post": post,
                 "comment_form": CommentForm(),
-                "comments": get_comments(Comment.objects.filter(post_id=post.id))
+                "comment": comment,
                 }
                 )}
             )

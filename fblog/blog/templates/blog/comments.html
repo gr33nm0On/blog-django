@@ -1,9 +1,25 @@
-{% if comments %}
+<div class="btn-comment-container">
+    <form method="post" action="{% url 'create_comment' %}" class="ajax-form" data-type="comment" data-post-id="{{ post.id }}" data-comment-id="{{ comment.id }}">
+        {% csrf_token %}
+        {{ comment_form.as_p }}
+        <input type="hidden" name="post_id" value="{{ post.id }}">
+        <input type="hidden" name="reply_to" value="{{ comment.id }}">
+        <button type="submit">Comment</button>
+    </form>
+</div>
+
 <h4>Comments:</h4>
-<button id="btn-comments-list-container-{{ post.id }}"onclick="showComments('{{ post.id }}')" style="width: 100%;">Show comments</button>
-<div id="comments-list-container-{{ post.id }}" style="display: none;">
+<button
+    id="btn-comment-container-{{ post.id }}"
+    onclick="showComments('{{ post.id }}')"
+    style="width: 100%;"
+    {% if not comments %} hidden {% endif %}
+>
+    Show comments
+</button>
+
+<div id="comment-container-{{ post.id }}" hidden>
     {% for comment in comments %}
         {% include "blog/comment_tree.html" with comment=comment post=post comment_form=comment_form %}
     {% endfor %}
 </div>
-{% endif %}

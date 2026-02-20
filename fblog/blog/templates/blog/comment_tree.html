@@ -16,7 +16,7 @@
         </div>
 
         <div class="btn-comment-container">
-            <form method="post" action="{% url 'create_comment' %}" class="ajax-form" data-type="comment" data-post-id="{{ post.id }}">
+            <form method="post" action="{% url 'create_comment' %}" class="ajax-form" data-type="comment" data-parent-id="{{ comment.parent.id }}" data-post-id="{{ comment.post.id }}" data-comment-id="{{ comment.id }}">
                 {% csrf_token %}
                 {{ comment_form.as_p }}
                 <input type="hidden" name="post_id" value="{{ post.id }}">
@@ -25,12 +25,18 @@
             </form>
         </div>
     </div>
-    {% if comment.children %}
-    <button id="btn-comment-comments-list-container-{{ comment.id }}" onclick="showCommentComments('{{ comment.id }}')" style="width: 100%;">Show replies</button>
-    <div id="comment-comments-list-container-{{ comment.id }}" style="display: none; background: ">
+
+    <button
+        id="btn-comment-container-{{ post.id }}-{{ comment.id }}"
+        onclick="showReplies('{{ post.id }}', '{{ comment.id }}')"
+        style="width: 100%;"
+        {% if not comment.children %} hidden {% endif %}
+    >
+        Show replies
+    </button>
+    <div id="comment-container-{{ post.id }}-{{ comment.id }}" hidden>
     {% for child in comment.children %}
-        {% include "blog/comment_tree.html" with comment=child post=post form=form redirect_to=redirect_to %}
+        {% include "blog/comment_tree.html" with comment=child post=post form=form %}
     {% endfor %}
     </div>
-    {% endif %}
 </div>

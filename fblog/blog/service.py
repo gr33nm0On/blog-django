@@ -38,11 +38,11 @@ def load_posts(request):
 
     page_obj = get_paginated_posts(page_number)
 
-    form = CommentForm()
+    comment_form = CommentForm()
 
     html = render_to_string(
         "blog/posts.html",
-        {"posts": page_obj.object_list, "form": form},
+        {"posts": page_obj.object_list, "comment_form": comment_form},
     )
 
     return JsonResponse({
