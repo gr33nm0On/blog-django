@@ -5,19 +5,7 @@ document.addEventListener("submit", function(e) {
 
     e.preventDefault();
 
-    const submitButtons = e.target.querySelectorAll('button[type="submit"], input[type="submit"]');
-    submitButtons.forEach(btn => {
-        btn.disabled = true;
-    });
-
     const formData = new FormData(e.target);
-    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
-
-    if (!csrftoken) {
-        console.error('CSRF token not found');
-        submitButtons.forEach(btn => btn.disabled = false);
-        return;
-    }
 
     formData.append('csrfmiddlewaretoken', csrftoken);
 
